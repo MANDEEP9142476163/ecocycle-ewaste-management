@@ -6,6 +6,10 @@ const getBaseUrl = () => {
   if (envUrl && envUrl.trim() !== '') {
     return `${envUrl.replace(/\/$/, '')}/api`;
   }
+  // In production builds outside localhost, default directly to the live Render backend
+  if (import.meta.env.PROD && typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+    return 'https://ecocycle-backend-oc27.onrender.com/api';
+  }
   return '/api';
 };
 
@@ -17,7 +21,11 @@ export const getUploadUrl = (imagePath) => {
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     return imagePath;
   }
-  const envUrl = import.meta.env.VITE_API_URL;
+  const envUrl = import.meta.env.VITE_API_URL || (
+    import.meta.env.PROD && typeof window !== 'undefined' && !window.location.hostname.includes('localhost')
+      ? 'https://ecocycle-backend-oc27.onrender.com'
+      : ''
+  );
   if (envUrl && envUrl.trim() !== '') {
     return `${envUrl.replace(/\/$/, '')}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
   }
