@@ -311,7 +311,7 @@ const SubmitProduct = () => {
                   required
                   value={formData.contact_number}
                   onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
-                  placeholder="+1 415-555-0177"
+                  placeholder="+91 98765 43210"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-xs"
                 />
               </div>

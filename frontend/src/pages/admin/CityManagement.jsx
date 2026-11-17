@@ -224,7 +224,7 @@ const CityManagement = () => {
                   required
                   value={formCityName}
                   onChange={(e) => setFormCityName(e.target.value)}
-                  placeholder="e.g. San Francisco"
+                  placeholder="e.g. Bhagalpur"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
                 />
               </div>

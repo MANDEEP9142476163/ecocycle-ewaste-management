@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import {
   Recycle, ArrowRight, Laptop, Smartphone, Tv, Printer, BatteryCharging,
   Cpu, CheckCircle2, ShieldCheck, Truck, Sparkles, Send, MapPin, Phone,
-  Mail, AlertTriangle, Leaf, Globe2, BarChart3
+  Mail, Clock, AlertTriangle, Leaf, Globe2, BarChart3
 } from 'lucide-react';
 
 const LandingPage = () => {
@@ -349,29 +349,43 @@ const LandingPage = () => {
                 {contactPage?.page_title || 'Contact EcoCycle Support'}
               </h2>
               <div className="text-slate-600 text-sm mt-3 leading-relaxed whitespace-pre-line">
-                {contactPage?.page_description || (
-                  <p>Have questions regarding your e-waste pickup, bulk corporate electronics disposal, or society collection drives? Our green support desk is available 6 days a week.</p>
-                )}
+                {contactPage?.page_description || `We are here to support your green journey. Reach out to our central operations team for pickup inquiries, institutional bulk e-waste recycling, or society partnership opportunities.
+
+Operational Headquarters:
+Indian Institute of Information Technology Bhagalpur
+IIIT Bhagalpur, Bihar, India
+Phone: +91 98765 43210
+Email: ecocycle.project@gmail.com
+Support Hours: Monday - Saturday, 9:00 AM - 6:00 PM IST`}
               </div>
 
               <div className="mt-8 space-y-4 text-sm text-slate-700">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-5 h-5" />
                   </div>
-                  <span>IIIT Bhagalpur, Bihar, India</span>
+                  <div>
+                    <p className="font-semibold text-slate-900">Location:</p>
+                    <p className="text-slate-600">IIIT Bhagalpur, Bihar, India</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
                     <Phone className="w-5 h-5" />
                   </div>
-                  <span>+91 9876543210</span>
+                  <div>
+                    <span className="font-semibold text-slate-900">Phone: </span>
+                    <a href="tel:+919876543210" className="hover:text-emerald-700 transition-colors font-medium">+91 98765 43210</a>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
                     <Mail className="w-5 h-5" />
                   </div>
-                  <span>ecocycle.project@gmail.com</span>
+                  <div>
+                    <span className="font-semibold text-slate-900">Email: </span>
+                    <a href="mailto:ecocycle.project@gmail.com" className="hover:text-emerald-700 transition-colors font-medium">ecocycle.project@gmail.com</a>
+                  </div>
                 </div>
               </div>
             </div>

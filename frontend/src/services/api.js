@@ -1,7 +1,31 @@
 import axios from 'axios';
 
+// Determine base API URL
+const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim() !== '') {
+    return `${envUrl.replace(/\/$/, '')}/api`;
+  }
+  return '/api';
+};
+
+export const API_BASE_URL = getBaseUrl();
+
+// Helper to resolve upload images
+export const getUploadUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim() !== '') {
+    return `${envUrl.replace(/\/$/, '')}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+  }
+  return imagePath;
+};
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }

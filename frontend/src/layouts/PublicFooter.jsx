@@ -73,15 +73,18 @@ const PublicFooter = () => {
             <ul className="space-y-3 text-sm text-slate-400">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                <span>IIIT Bhagalpur, Bihar, India</span>
+                <div>
+                  <span className="block text-white font-medium">Indian Institute of Information Technology Bhagalpur</span>
+                  <span className="text-xs text-slate-400">IIIT Bhagalpur, Bihar, India</span>
+                </div>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span>+91 9876543210</span>
+                <a href="tel:+919876543210" className="hover:text-emerald-400 transition-colors">+91 98765 43210</a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span>ecocycle.project@gmail.com</span>
+                <a href="mailto:ecocycle.project@gmail.com" className="hover:text-emerald-400 transition-colors">ecocycle.project@gmail.com</a>
               </li>
             </ul>
           </div>

@@ -6,8 +6,8 @@ async function seed() {
   try {
     // 1. Seed States
     const states = [
-      'California', 'New York', 'Texas', 'Washington', 'Illinois',
-      'Massachusetts', 'Florida', 'Colorado', 'Georgia', 'Pennsylvania'
+      'Bihar', 'Maharashtra', 'Delhi', 'Karnataka', 'Uttar Pradesh',
+      'West Bengal', 'Tamil Nadu', 'Gujarat', 'Rajasthan', 'Telangana'
     ];
     for (const state of states) {
       await pool.query(
@@ -24,12 +24,12 @@ async function seed() {
 
     // 2. Seed Cities
     const cityList = [
-      { state: 'California', cities: ['San Francisco', 'San Jose', 'Los Angeles', 'San Diego', 'Sacramento'] },
-      { state: 'New York', cities: ['New York City', 'Buffalo', 'Rochester', 'Albany'] },
-      { state: 'Texas', cities: ['Austin', 'Dallas', 'Houston', 'San Antonio'] },
-      { state: 'Washington', cities: ['Seattle', 'Bellevue', 'Tacoma', 'Spokane'] },
-      { state: 'Illinois', cities: ['Chicago', 'Naperville', 'Aurora'] },
-      { state: 'Massachusetts', cities: ['Boston', 'Cambridge', 'Worcester'] }
+      { state: 'Bihar', cities: ['Bhagalpur', 'Patna', 'Gaya', 'Muzaffarpur', 'Darbhanga', 'Purnia'] },
+      { state: 'Maharashtra', cities: ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Thane'] },
+      { state: 'Delhi', cities: ['New Delhi', 'North Delhi', 'South Delhi', 'Dwarka'] },
+      { state: 'Karnataka', cities: ['Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi'] },
+      { state: 'Uttar Pradesh', cities: ['Lucknow', 'Kanpur', 'Varanasi', 'Noida', 'Prayagraj'] },
+      { state: 'West Bengal', cities: ['Kolkata', 'Howrah', 'Siliguri', 'Durgapur'] }
     ];
 
     for (const group of cityList) {
@@ -70,7 +70,7 @@ async function seed() {
       await pool.query(
         `INSERT INTO admins (admin_name, username, email, mobile_number, password)
          VALUES (?, ?, ?, ?, ?)`,
-        ['System Administrator', 'admin', 'admin@ecocycle.org', '+1 800-555-0199', adminPasswordHash]
+        ['System Administrator', 'admin', 'admin@ecocycle.org', '+91 98765 43210', adminPasswordHash]
       );
       console.log('[Seed] Initial Admin seeded: admin / Admin@123');
     }
@@ -83,14 +83,14 @@ async function seed() {
       const [result1] = await pool.query(
         `INSERT INTO employees (employee_code, name, email, contact_number, address, password, status, joining_date)
          VALUES (?, ?, ?, ?, ?, ?, 'Active', '2025-01-15')`,
-        ['EMP001', 'Alex Mercer', 'alex.mercer@ecocycle.org', '+1 415-555-0142', '456 Mission St, San Francisco, CA', empPasswordHash]
+        ['EMP001', 'Alex Mercer', 'alex.mercer@ecocycle.org', '+91 98765 43211', 'IIIT Bhagalpur Campus, Bihar, India', empPasswordHash]
       );
       emp1Id = result1.insertId;
 
       await pool.query(
         `INSERT INTO employees (employee_code, name, email, contact_number, address, password, status, joining_date)
          VALUES (?, ?, ?, ?, ?, ?, 'Active', '2025-03-01')`,
-        ['EMP002', 'Sarah Jenkins', 'sarah.j@ecocycle.org', '+1 206-555-0188', '789 Pine Ave, Seattle, WA', empPasswordHash]
+        ['EMP002', 'Sarah Jenkins', 'sarah.j@ecocycle.org', '+91 98765 43212', 'IIIT Bhagalpur Depot, Bihar, India', empPasswordHash]
       );
       console.log('[Seed] Employees seeded: EMP001 (alex.mercer@ecocycle.org / Employee@123), EMP002');
     } else {
@@ -105,7 +105,7 @@ async function seed() {
       const [uRes] = await pool.query(
         `INSERT INTO users (full_name, email, mobile_number, password)
          VALUES (?, ?, ?, ?)`,
-        ['David Miller', 'user@ecocycle.org', '+1 415-555-0177', userPasswordHash]
+        ['David Miller', 'user@ecocycle.org', '+91 98765 43210', userPasswordHash]
       );
       sampleUserId = uRes.insertId;
       console.log('[Seed] Sample User seeded: user@ecocycle.org / User@123');
@@ -125,15 +125,14 @@ Founded under the SAI-III Society Internship Project on "Strategies of Electroni
       {
         page_type: 'contact_us',
         page_title: 'Contact EcoCycle Support',
-        page_description: `We are here to support your green journey. Reach out to our central operations team for pickup inquiries, corporate bulk e-waste recycling, or partnership opportunities.
+        page_description: `We are here to support your green journey. Reach out to our central operations team for pickup inquiries, institutional bulk e-waste recycling, or society partnership opportunities.
 
 Operational Headquarters:
-EcoCycle Green Technologies Hub
-Suite 400, CleanTech Plaza
-San Francisco, CA 94105
-Phone: +1 (800) ECO-WASTE (1-800-326-9278)
-Email: contact@ecocycle.org
-Support Hours: Monday – Saturday, 8:00 AM – 7:00 PM EST`
+Indian Institute of Information Technology Bhagalpur
+IIIT Bhagalpur, Bihar, India
+Phone: +91 98765 43210
+Email: ecocycle.project@gmail.com
+Support Hours: Monday - Saturday, 9:00 AM - 6:00 PM IST`
       }
     ];
 
@@ -154,9 +153,9 @@ Support Hours: Monday – Saturday, 8:00 AM – 7:00 PM EST`
       const catMap = {};
       catRows.forEach(c => { catMap[c.category_name] = c.id; });
 
-      const calStateId = stateMap['California'];
-      const [sfCity] = await pool.query('SELECT id FROM cities WHERE city_name = ?', ['San Francisco']);
-      const sfCityId = sfCity[0]?.id || null;
+      const biharStateId = stateMap['Bihar'] || null;
+      const [bgpCity] = await pool.query('SELECT id FROM cities WHERE city_name = ?', ['Bhagalpur']);
+      const bgpCityId = bgpCity[0]?.id || null;
 
       const sampleProducts = [
         {
@@ -166,11 +165,11 @@ Support Hours: Monday – Saturday, 8:00 AM – 7:00 PM EST`
           brand: 'Dell',
           model: 'Inspiron 5570',
           desc: 'Old 15-inch laptop with cracked screen and failing HDD. Motherboard and RAM intact.',
-          price: 45.00,
+          price: 4500.00,
           date: '2026-11-20',
-          addr: '101 Market St, Apt 4B',
-          person: 'David Miller',
-          phone: '+1 415-555-0177',
+          addr: 'IIIT Bhagalpur Campus, Sabour',
+          person: 'Rahul Kumar',
+          phone: '+91 98765 43210',
           status: 'Collected',
           empId: emp1Id
         },
@@ -181,11 +180,11 @@ Support Hours: Monday – Saturday, 8:00 AM – 7:00 PM EST`
           brand: 'Samsung',
           model: 'UN55KU6500FXZA',
           desc: 'Powers on with horizontal colored backlight lines across display panel.',
-          price: 30.00,
+          price: 3200.00,
           date: '2026-11-22',
-          addr: '101 Market St, Apt 4B',
-          person: 'David Miller',
-          phone: '+1 415-555-0177',
+          addr: 'Station Road, Bhagalpur',
+          person: 'Rahul Kumar',
+          phone: '+91 98765 43210',
           status: 'Assigned',
           empId: emp1Id
         },
@@ -196,11 +195,11 @@ Support Hours: Monday – Saturday, 8:00 AM – 7:00 PM EST`
           brand: 'HP',
           model: 'M428fdw',
           desc: 'Office laser printer with recurrent paper jam and roller wear. Includes partial toner cartridge.',
-          price: 25.00,
+          price: 2500.00,
           date: '2026-11-25',
-          addr: '200 Howard St, Suite 100',
-          person: 'David Miller',
-          phone: '+1 415-555-0177',
+          addr: 'Tilka Manjhi Chowk, Bhagalpur',
+          person: 'Rahul Kumar',
+          phone: '+91 98765 43210',
           status: 'Pending',
           empId: null
         },
@@ -211,11 +210,11 @@ Support Hours: Monday – Saturday, 8:00 AM – 7:00 PM EST`
           brand: 'Apple',
           model: 'A2111 / A1489',
           desc: 'iPhone with depleted battery (68% health) and iPad Mini with cracked digitizer.',
-          price: 55.00,
+          price: 5500.00,
           date: '2026-11-10',
-          addr: '101 Market St, Apt 4B',
-          person: 'David Miller',
-          phone: '+1 415-555-0177',
+          addr: 'Zero Mile, Bhagalpur',
+          person: 'Rahul Kumar',
+          phone: '+91 98765 43210',
           status: 'Recycled',
           empId: emp1Id
         }
@@ -230,7 +229,7 @@ Support Hours: Monday – Saturday, 8:00 AM – 7:00 PM EST`
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             p.code, sampleUserId, p.cat, p.name, p.brand, p.model,
-            p.desc, p.price, p.date, p.addr, calStateId, sfCityId,
+            p.desc, p.price, p.date, p.addr, biharStateId, bgpCityId,
             p.person, p.phone, p.status, p.empId
           ]
         );

@@ -134,7 +134,7 @@ const RegisterPage = () => {
                   required
                   value={formData.mobile_number}
                   onChange={handleChange}
-                  placeholder="+1 415-555-0177"
+                  placeholder="+91 98765 43210"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
                 />
               </div>

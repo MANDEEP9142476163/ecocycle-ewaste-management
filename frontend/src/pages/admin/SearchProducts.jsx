@@ -49,7 +49,7 @@ const SearchProducts = () => {
               required
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="e.g. ECO-2026-00001 or Inspiron or 415-555"
+              placeholder="e.g. ECO-2026-00001 or Inspiron or 98765"
               className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
