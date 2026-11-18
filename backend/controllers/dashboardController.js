@@ -64,17 +64,17 @@ exports.getAdminDashboard = async (req, res) => {
     return res.json({
       success: true,
       stats: {
-        total_users: userCount[0].total,
-        total_employees: empCount[0].total,
-        total_products: prodCounts[0].total_listed || 0,
-        pending_requests: prodCounts[0].pending_requests || 0,
-        assigned_products: prodCounts[0].assigned_products || 0,
-        unassigned_products: prodCounts[0].unassigned_products || 0,
-        under_investigation: prodCounts[0].under_investigation || 0,
-        collected_products: prodCounts[0].collected_products || 0,
-        sent_for_recycling: prodCounts[0].sent_for_recycling || 0,
-        recycled_products: prodCounts[0].recycled_products || 0,
-        rejected_products: prodCounts[0].rejected_products || 0
+        total_users: Number(userCount[0].total) || 0,
+        total_employees: Number(empCount[0].total) || 0,
+        total_products: Number(prodCounts[0].total_listed) || 0,
+        pending_requests: Number(prodCounts[0].pending_requests) || 0,
+        assigned_products: Number(prodCounts[0].assigned_products) || 0,
+        unassigned_products: Number(prodCounts[0].unassigned_products) || 0,
+        under_investigation: Number(prodCounts[0].under_investigation) || 0,
+        collected_products: Number(prodCounts[0].collected_products) || 0,
+        sent_for_recycling: Number(prodCounts[0].sent_for_recycling) || 0,
+        recycled_products: Number(prodCounts[0].recycled_products) || 0,
+        rejected_products: Number(prodCounts[0].rejected_products) || 0
       },
       charts: {
         status_distribution: statusDist,
@@ -97,8 +97,7 @@ exports.getEmployeeDashboard = async (req, res) => {
     const [counts] = await pool.query(`
       SELECT 
         COUNT(*) as total_assigned,
-        SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as pending_assignment,
-        SUM(CASE WHEN status = 'Under Investigation' THEN 1 ELSE 0 END) as under_investigation,
+        SUM(CASE WHEN status IN ('Assigned', 'Under Investigation') THEN 1 ELSE 0 END) as pending_investigation,
         SUM(CASE WHEN status = 'Collected' THEN 1 ELSE 0 END) as collected,
         SUM(CASE WHEN status = 'Sent for Recycling' THEN 1 ELSE 0 END) as sent_for_recycling,
         SUM(CASE WHEN status = 'Recycled' THEN 1 ELSE 0 END) as recycled,
@@ -127,15 +126,17 @@ exports.getEmployeeDashboard = async (req, res) => {
         END, p.id DESC
     `, [employeeId]);
 
+    const row = counts[0] || {};
+
     return res.json({
       success: true,
       stats: {
-        total_assigned: counts[0].total_assigned || 0,
-        pending_investigation: (counts[0].pending_assignment || 0) + (counts[0].under_investigation || 0),
-        collected: counts[0].collected || 0,
-        sent_for_recycling: counts[0].sent_for_recycling || 0,
-        recycled: counts[0].recycled || 0,
-        rejected: counts[0].rejected || 0
+        total_assigned: Number(row.total_assigned) || 0,
+        pending_investigation: Number(row.pending_investigation) || 0,
+        collected: Number(row.collected) || 0,
+        sent_for_recycling: Number(row.sent_for_recycling) || 0,
+        recycled: Number(row.recycled) || 0,
+        rejected: Number(row.rejected) || 0
       },
       assigned_requests: assignedRequests
     });
@@ -177,13 +178,13 @@ exports.getUserDashboard = async (req, res) => {
     return res.json({
       success: true,
       stats: {
-        total_listed: counts[0].total_listed || 0,
-        pending_requests: counts[0].pending_requests || 0,
-        assigned_requests: counts[0].assigned_requests || 0,
-        collected: counts[0].collected || 0,
-        sent_for_recycling: counts[0].sent_for_recycling || 0,
-        recycled: counts[0].recycled || 0,
-        rejected: counts[0].rejected || 0
+        total_listed: Number(counts[0].total_listed) || 0,
+        pending_requests: Number(counts[0].pending_requests) || 0,
+        assigned_requests: Number(counts[0].assigned_requests) || 0,
+        collected: Number(counts[0].collected) || 0,
+        sent_for_recycling: Number(counts[0].sent_for_recycling) || 0,
+        recycled: Number(counts[0].recycled) || 0,
+        rejected: Number(counts[0].rejected) || 0
       },
       recent_products: recentProducts
     });
