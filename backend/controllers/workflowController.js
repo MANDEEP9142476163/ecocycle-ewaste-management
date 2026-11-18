@@ -1,5 +1,5 @@
 const { pool } = require('../config/db');
-const notificationService = require('../services/notificationService');
+const { createNotification } = require('../utils/notificationHelper');
 
 // 1. Admin assigns employee to product
 exports.assignProduct = async (req, res) => {
@@ -17,8 +17,7 @@ exports.assignProduct = async (req, res) => {
 
     // Verify product exists
     const [prods] = await connection.query(
-      `SELECT id, product_code, product_name, status, user_id, contact_person, contact_number, pickup_address, pickup_date
-       FROM products WHERE id = ?`,
+      'SELECT id, product_code, product_name, status, user_id FROM products WHERE id = ?',
       [id]
     );
     if (prods.length === 0) {
@@ -30,7 +29,7 @@ exports.assignProduct = async (req, res) => {
 
     // Verify employee exists and is active
     const [emps] = await connection.query(
-      "SELECT id, name, employee_code, email, contact_number FROM employees WHERE id = ? AND status = 'Active'",
+      "SELECT id, name, employee_code, email FROM employees WHERE id = ? AND status = 'Active'",
       [employee_id]
     );
     if (emps.length === 0) {
@@ -61,12 +60,20 @@ exports.assignProduct = async (req, res) => {
 
     await connection.commit();
 
-    // Trigger automated multichannel notifications (Citizen & Employee)
-    await notificationService.notifyEmployeeAssigned({
-      product,
-      employee,
-      user: { id: product.user_id }
-    }).catch(err => console.error('[Notification] Assign notify error:', err.message));
+    // Send notifications
+    await createNotification({
+      recipientRole: 'employee',
+      recipientId: employee.id,
+      title: 'New Product Assigned For Investigation',
+      message: `You have been assigned to investigate ${product.product_name} (${product.product_code}).`
+    });
+
+    await createNotification({
+      recipientRole: 'user',
+      recipientId: product.user_id,
+      title: 'Pickup Inspector Assigned',
+      message: `Officer ${employee.name} has been assigned to inspect and collect your item (${product.product_code}).`
+    });
 
     return res.json({
       success: true,
@@ -92,8 +99,7 @@ exports.investigateProduct = async (req, res) => {
     const employeeId = req.user.id;
 
     const [prods] = await connection.query(
-      `SELECT id, product_code, product_name, status, assigned_employee_id, user_id, contact_person, contact_number, pickup_address
-       FROM products WHERE id = ?`,
+      'SELECT id, product_code, product_name, status, assigned_employee_id, user_id FROM products WHERE id = ?',
       [id]
     );
     if (prods.length === 0) {
@@ -133,13 +139,12 @@ exports.investigateProduct = async (req, res) => {
 
     await connection.commit();
 
-    // Trigger automated multichannel notifications
-    await notificationService.notifyUnderInvestigation({
-      product,
-      employee: req.user,
-      user: { id: product.user_id },
-      remarks: remarkText
-    }).catch(err => console.error('[Notification] Investigation notify error:', err.message));
+    await createNotification({
+      recipientRole: 'user',
+      recipientId: product.user_id,
+      title: 'Investigation In Progress',
+      message: `Your product (${product.product_code}) is currently being inspected by ${req.user.name}.`
+    });
 
     return res.json({ success: true, message: 'Product is now under investigation.' });
   } catch (error) {
@@ -158,12 +163,11 @@ exports.collectProduct = async (req, res) => {
     await connection.beginTransaction();
 
     const { id } = req.params;
-    const { remarks } = req.body;
+    const { remarks, collection_date } = req.body;
     const employeeId = req.user.id;
 
     const [prods] = await connection.query(
-      `SELECT id, product_code, product_name, status, assigned_employee_id, user_id, contact_person, contact_number, pickup_address
-       FROM products WHERE id = ?`,
+      'SELECT id, product_code, product_name, status, assigned_employee_id, user_id FROM products WHERE id = ?',
       [id]
     );
     if (prods.length === 0) {
@@ -203,13 +207,18 @@ exports.collectProduct = async (req, res) => {
 
     await connection.commit();
 
-    // Trigger automated multichannel notifications (Citizen & Admin)
-    await notificationService.notifyProductCollected({
-      product,
-      employee: req.user,
-      user: { id: product.user_id },
-      remarks: remarkText
-    }).catch(err => console.error('[Notification] Collection notify error:', err.message));
+    await createNotification({
+      recipientRole: 'user',
+      recipientId: product.user_id,
+      title: 'E-Waste Item Collected',
+      message: `Your product (${product.product_code}) has been collected and will be transported for recycling.`
+    });
+
+    await createNotification({
+      recipientRole: 'admin',
+      title: 'Item Collected by Employee',
+      message: `${req.user.name} collected product ${product.product_code}.`
+    });
 
     return res.json({ success: true, message: 'Product marked as Collected successfully.' });
   } catch (error) {
@@ -232,8 +241,7 @@ exports.sendForRecycling = async (req, res) => {
     const employeeId = req.user.id;
 
     const [prods] = await connection.query(
-      `SELECT id, product_code, product_name, status, assigned_employee_id, user_id, contact_person, contact_number
-       FROM products WHERE id = ?`,
+      'SELECT id, product_code, product_name, status, assigned_employee_id, user_id FROM products WHERE id = ?',
       [id]
     );
     if (prods.length === 0) {
@@ -273,13 +281,12 @@ exports.sendForRecycling = async (req, res) => {
 
     await connection.commit();
 
-    // Trigger automated multichannel notifications
-    await notificationService.notifySentForRecycling({
-      product,
-      employee: req.user,
-      user: { id: product.user_id },
-      remarks: remarkText
-    }).catch(err => console.error('[Notification] Send recycling notify error:', err.message));
+    await createNotification({
+      recipientRole: 'user',
+      recipientId: product.user_id,
+      title: 'Sent For Recycling',
+      message: `Your electronic waste (${product.product_code}) has been dispatched to our partner recycling plant.`
+    });
 
     return res.json({ success: true, message: 'Product marked as Sent for Recycling.' });
   } catch (error) {
@@ -302,8 +309,7 @@ exports.completeRecycling = async (req, res) => {
     const employeeId = req.user.id;
 
     const [prods] = await connection.query(
-      `SELECT id, product_code, product_name, status, assigned_employee_id, user_id, contact_person, contact_number
-       FROM products WHERE id = ?`,
+      'SELECT id, product_code, product_name, status, assigned_employee_id, user_id FROM products WHERE id = ?',
       [id]
     );
     if (prods.length === 0) {
@@ -343,13 +349,12 @@ exports.completeRecycling = async (req, res) => {
 
     await connection.commit();
 
-    // Trigger automated multichannel notifications
-    await notificationService.notifyRecyclingCompleted({
-      product,
-      employee: req.user,
-      user: { id: product.user_id },
-      remarks: remarkText
-    }).catch(err => console.error('[Notification] Complete recycling notify error:', err.message));
+    await createNotification({
+      recipientRole: 'user',
+      recipientId: product.user_id,
+      title: 'Recycling Successfully Completed! 🌱',
+      message: `Congratulations! Your item (${product.product_code}) has been 100% sustainably recycled.`
+    });
 
     return res.json({ success: true, message: 'Product marked as Recycled successfully.' });
   } catch (error) {
@@ -380,8 +385,7 @@ exports.rejectProduct = async (req, res) => {
     }
 
     const [prods] = await connection.query(
-      `SELECT id, product_code, product_name, status, assigned_employee_id, user_id, contact_person, contact_number
-       FROM products WHERE id = ?`,
+      'SELECT id, product_code, product_name, status, assigned_employee_id, user_id FROM products WHERE id = ?',
       [id]
     );
     if (prods.length === 0) {
@@ -419,13 +423,12 @@ exports.rejectProduct = async (req, res) => {
 
     await connection.commit();
 
-    // Trigger automated multichannel notifications
-    await notificationService.notifyProductRejected({
-      product,
-      employee: req.user,
-      user: { id: product.user_id },
-      rejectionReason: rejection_reason.trim()
-    }).catch(err => console.error('[Notification] Reject notify error:', err.message));
+    await createNotification({
+      recipientRole: 'user',
+      recipientId: product.user_id,
+      title: 'Product Pickup Request Rejected',
+      message: `Your request (${product.product_code}) could not be collected. Reason: ${rejection_reason.trim()}`
+    });
 
     return res.json({ success: true, message: 'Product has been marked as Rejected.' });
   } catch (error) {

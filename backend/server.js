@@ -53,7 +53,6 @@ app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/pages', require('./routes/pageRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
-app.post('/api/contact', require('./controllers/notificationController').submitContactInquiry);
 
 // Health check endpoint with diagnostic database status
 app.get('/api/health', async (req, res) => {

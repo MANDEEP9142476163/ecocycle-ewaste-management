@@ -1,7 +1,6 @@
 const { pool } = require('../config/db');
 const { generateProductCode } = require('../utils/codeGenerator');
 const { createNotification } = require('../utils/notificationHelper');
-const notificationService = require('../services/notificationService');
 
 // 1. Create Product (User listing e-waste)
 exports.createProduct = async (req, res) => {
@@ -84,20 +83,12 @@ exports.createProduct = async (req, res) => {
 
     await connection.commit();
 
-    // Trigger automated multichannel notifications (Citizen confirmation + Admin alert)
-    await notificationService.notifyPickupSubmitted({
-      product: {
-        id: productId,
-        product_code: productCode,
-        product_name: product_name.trim(),
-        pickup_date,
-        pickup_address: pickup_address.trim(),
-        contact_number: contact_number.trim(),
-        contact_person: contact_person ? contact_person.trim() : req.user.name,
-        user_id: userId
-      },
-      user: req.user
-    }).catch(err => console.error('[Notification] Pickup submit notify error:', err.message));
+    // Create notification for admin
+    await createNotification({
+      recipientRole: 'admin',
+      title: 'New E-Waste Request Submitted',
+      message: `User ${req.user.name} submitted a new request: ${product_name} (${productCode}).`
+    });
 
     return res.status(201).json({
       success: true,
@@ -275,20 +266,6 @@ exports.updateProduct = async (req, res) => {
       [product_name, category_id, brand, model_type, description, expected_price, pickup_date, pickup_address, id]
     );
 
-    // Notify citizen & employee if schedule/address changed
-    notificationService.notifyPickupScheduledOrUpdated({
-      product: {
-        id: product.id,
-        product_code: product.product_code,
-        product_name: product_name || product.product_name,
-        pickup_date: pickup_date || product.pickup_date,
-        pickup_address: pickup_address || product.pickup_address,
-        contact_number: product.contact_number,
-        user_id: product.user_id
-      },
-      user: req.user
-    }).catch(err => console.error('[Notification] Schedule update notify error:', err.message));
-
     return res.json({ success: true, message: 'Product updated successfully.' });
   } catch (error) {
     console.error('updateProduct error:', error);
@@ -319,28 +296,6 @@ exports.deleteProduct = async (req, res) => {
     }
 
     await pool.query('DELETE FROM products WHERE id = ?', [id]);
-
-    // Notify Admin of cancelled request
-    notificationService.dispatch({
-      eventType: 'request_cancelled',
-      recipientRole: 'admin',
-      title: 'E-Waste Pickup Request Cancelled',
-      message: `Request [${product.product_code}] (${product.product_name}) was cancelled/deleted by ${req.user.name}.`,
-      entityId: product.id
-    }).catch(err => console.error('[Notification] Cancel request notify error:', err.message));
-
-    // If product had an assigned employee, notify employee that task is cancelled
-    if (product.assigned_employee_id) {
-      notificationService.dispatch({
-        eventType: 'task_cancelled',
-        recipientRole: 'employee',
-        recipientId: product.assigned_employee_id,
-        title: 'Task Assignment Cancelled',
-        message: `Task Notice: The assignment for item [${product.product_code}] (${product.product_name}) has been cancelled.`,
-        entityId: product.id
-      }).catch(err => console.error('[Notification] Cancel task employee notify error:', err.message));
-    }
-
     return res.json({ success: true, message: 'Product request deleted successfully.' });
   } catch (error) {
     console.error('deleteProduct error:', error);

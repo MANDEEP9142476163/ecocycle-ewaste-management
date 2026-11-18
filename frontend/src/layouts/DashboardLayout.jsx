@@ -97,7 +97,6 @@ const DashboardLayout = () => {
         { header: 'INTELLIGENCE & CMS' },
         { label: 'Analytics Reports', path: '/admin/reports', icon: FileBarChart2 },
         { label: 'Website CMS Pages', path: '/admin/pages', icon: FileText },
-        { label: 'Notifications & Alerts', path: '/admin/notifications', icon: Bell },
         { header: 'ACCOUNT' },
         { label: 'Admin Profile', path: '/admin/profile', icon: User }
       ];

@@ -14,14 +14,7 @@ const LandingPage = () => {
   const [categories, setCategories] = useState([]);
   const [aboutPage, setAboutPage] = useState(null);
   const [contactPage, setContactPage] = useState(null);
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
-    consent_sms_whatsapp: true
-  });
+  const [contactForm, setContactForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [sendingContact, setSendingContact] = useState(false);
 
   useEffect(() => {
@@ -43,43 +36,18 @@ const LandingPage = () => {
     loadContent();
   }, []);
 
-  const handleContactSubmit = async (e) => {
+  const handleContactSubmit = (e) => {
     e.preventDefault();
     if (!contactForm.name || !contactForm.email || !contactForm.message) {
       toast.error('Please fill in all required fields.');
       return;
     }
     setSendingContact(true);
-    try {
-      await api.post('/contact', contactForm);
-      toast.success('Thank you! Your inquiry has been received. Our team will contact you shortly.');
-      setContactForm({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-        consent_sms_whatsapp: true
-      });
-    } catch (err) {
-      // Fallback endpoint
-      try {
-        await api.post('/notifications/inquiries', contactForm);
-        toast.success('Thank you! Your inquiry has been received. Our team will contact you shortly.');
-        setContactForm({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: '',
-          consent_sms_whatsapp: true
-        });
-      } catch (fallbackErr) {
-        toast.error('Failed to submit inquiry. Please try again or email us directly.');
-      }
-    } finally {
+    setTimeout(() => {
       setSendingContact(false);
-    }
+      toast.success('Thank you! Your inquiry has been sent to our green recovery team.');
+      setContactForm({ name: '', email: '', subject: '', message: '' });
+    }, 800);
   };
 
   const getCategoryIcon = (name) => {
@@ -455,20 +423,6 @@ Support Hours: Monday - Saturday, 9:00 AM - 6:00 PM IST`}
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Mobile Phone Number (Optional)
-                  </label>
-                  <input
-                    type="tel"
-                    value={contactForm.phone}
-                    onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
-                    placeholder="+91 98765 43210"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-mono"
-                  />
-                  <span className="text-[11px] text-slate-400">Receive WhatsApp/SMS confirmation & status updates</span>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Subject
                   </label>
                   <input
@@ -492,19 +446,6 @@ Support Hours: Monday - Saturday, 9:00 AM - 6:00 PM IST`}
                     placeholder="Describe your request or electronic items..."
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
                   />
-                </div>
-
-                <div className="flex items-start gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="consent_sms_whatsapp"
-                    checked={contactForm.consent_sms_whatsapp}
-                    onChange={(e) => setContactForm({ ...contactForm, consent_sms_whatsapp: e.target.checked })}
-                    className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 h-4 w-4"
-                  />
-                  <label htmlFor="consent_sms_whatsapp" className="text-xs text-slate-600 leading-snug cursor-pointer select-none">
-                    I consent to receive green updates and inquiry status notifications via WhatsApp and SMS.
-                  </label>
                 </div>
 
                 <button

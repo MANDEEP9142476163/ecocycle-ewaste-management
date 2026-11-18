@@ -130,59 +130,9 @@ CREATE TABLE IF NOT EXISTS notifications (
   id INT AUTO_INCREMENT PRIMARY KEY,
   recipient_role ENUM('admin', 'employee', 'user') NOT NULL,
   recipient_id INT NULL,
-  event_type VARCHAR(100) NULL,
-  entity_id INT NULL,
   title VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_notifications_recipient (recipient_role, recipient_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 11. Contact Inquiries Table
-CREATE TABLE IF NOT EXISTS contact_inquiries (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(150) NOT NULL,
-  email VARCHAR(150) NOT NULL,
-  phone VARCHAR(20) NULL,
-  subject VARCHAR(200) NULL,
-  message TEXT NOT NULL,
-  consent_sms_whatsapp BOOLEAN DEFAULT FALSE,
-  status ENUM('New', 'Contacted', 'Resolved') DEFAULT 'New',
-  admin_notes TEXT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_inquiries_email (email),
-  INDEX idx_inquiries_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 12. Notification Settings Table
-CREATE TABLE IF NOT EXISTS notification_settings (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  setting_key VARCHAR(100) NOT NULL UNIQUE,
-  setting_value TEXT NOT NULL,
-  setting_group VARCHAR(50) DEFAULT 'general',
-  description VARCHAR(255),
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_settings_key (setting_key)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 13. Notification Logs (Delivery Audit & Channel History)
-CREATE TABLE IF NOT EXISTS notification_logs (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  channel ENUM('whatsapp', 'sms', 'in_app') NOT NULL,
-  event_type VARCHAR(100) NOT NULL,
-  recipient_role ENUM('admin', 'employee', 'user', 'visitor') NOT NULL,
-  recipient_id INT NULL,
-  recipient_destination VARCHAR(100) NULL,
-  title_or_template VARCHAR(255) NULL,
-  message_content TEXT NOT NULL,
-  status ENUM('sent', 'failed', 'skipped', 'dry_run') DEFAULT 'sent',
-  provider_response_id VARCHAR(255) NULL,
-  error_message TEXT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_logs_channel (channel),
-  INDEX idx_logs_event (event_type),
-  INDEX idx_logs_status (status),
-  INDEX idx_logs_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
