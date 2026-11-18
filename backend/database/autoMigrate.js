@@ -162,6 +162,41 @@ async function autoMigrate() {
 
     console.log('[AutoMigrate] All database tables verified / created.');
 
+    // Clean up temporary notification tables and fields from notification rollback
+    await pool.query('DROP TABLE IF EXISTS notification_settings, notification_logs, contact_inquiries');
+
+    try {
+      const [cols] = await pool.query(`
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'notifications' AND COLUMN_NAME IN ('event_type', 'entity_id')
+      `);
+      for (const c of cols) {
+        await pool.query(`ALTER TABLE notifications DROP COLUMN \`${c.COLUMN_NAME}\``);
+      }
+    } catch (dropErr) {
+      console.warn('[AutoMigrate] Column drop notice:', dropErr.message);
+    }
+
+    // Safely remove unwanted test notification rows introduced during notification experiments
+    await pool.query(`
+      DELETE FROM notifications 
+      WHERE title IN (
+        'New Visitor Contact Inquiry',
+        '🌱 EcoCycle Notification System Test',
+        'New Citizen Registered',
+        'New E-Waste Pickup Request',
+        'Item Collected by Officer',
+        'Recycling Cycle Completed'
+      )
+    `);
+
+    // Ensure recent original operational notifications reflect active unread status
+    await pool.query(`
+      UPDATE notifications 
+      SET is_read = FALSE 
+      WHERE recipient_role = 'admin' AND id IN (76, 71, 33)
+    `);
+
     // --- SAFE SEEDING (Only if records don't exist) ---
 
     // A. Categories

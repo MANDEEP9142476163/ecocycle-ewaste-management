@@ -7,7 +7,7 @@ exports.getNotifications = async (req, res) => {
       SELECT * FROM notifications 
       WHERE (recipient_role = ? AND (recipient_id = ? OR recipient_id IS NULL))
       ORDER BY id DESC
-      LIMIT 25
+      LIMIT 50
     `;
     const [notifications] = await pool.query(query, [role, id]);
     const unreadCount = notifications.filter(n => !n.is_read).length;
