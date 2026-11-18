@@ -462,6 +462,9 @@ class NotificationService {
    * A9. Product Rejected
    */
   async notifyProductRejected({ product, employee, user, rejectionReason }) {
+    const settings = await this.getSettings();
+
+    // Notify Citizen
     await this.dispatch({
       eventType: 'rejected',
       recipientRole: 'user',
@@ -470,6 +473,17 @@ class NotificationService {
       entityId: product.id,
       title: 'Pickup Request Status Update',
       message: `EcoCycle Notice: Your pickup request for "${product.product_name}" (${product.product_code}) could not be collected. Reason: ${rejectionReason}. Need help? Contact us: mandeepkumar12032005@gmail.com`
+    });
+
+    // Notify Admin
+    const adminPhone = settings.admin_alert_mobile || settings.admin_alert_whatsapp;
+    await this.dispatch({
+      eventType: 'rejected',
+      recipientRole: 'admin',
+      recipientPhone: adminPhone,
+      entityId: product.id,
+      title: 'Product Pickup Request Rejected',
+      message: `Pickup Rejected [${product.product_code}]: Officer ${employee.name} rejected "${product.product_name}". Reason: ${rejectionReason}.`
     });
   }
 

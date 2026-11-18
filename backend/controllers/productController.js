@@ -325,9 +325,21 @@ exports.deleteProduct = async (req, res) => {
       eventType: 'request_cancelled',
       recipientRole: 'admin',
       title: 'E-Waste Pickup Request Cancelled',
-      message: `Request [${product.product_code}] (${product.product_name}) was cancelled/deleted by user ${req.user.name}.`,
+      message: `Request [${product.product_code}] (${product.product_name}) was cancelled/deleted by ${req.user.name}.`,
       entityId: product.id
     }).catch(err => console.error('[Notification] Cancel request notify error:', err.message));
+
+    // If product had an assigned employee, notify employee that task is cancelled
+    if (product.assigned_employee_id) {
+      notificationService.dispatch({
+        eventType: 'task_cancelled',
+        recipientRole: 'employee',
+        recipientId: product.assigned_employee_id,
+        title: 'Task Assignment Cancelled',
+        message: `Task Notice: The assignment for item [${product.product_code}] (${product.product_name}) has been cancelled.`,
+        entityId: product.id
+      }).catch(err => console.error('[Notification] Cancel task employee notify error:', err.message));
+    }
 
     return res.json({ success: true, message: 'Product request deleted successfully.' });
   } catch (error) {
