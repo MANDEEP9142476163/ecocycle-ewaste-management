@@ -131,7 +131,7 @@ Operational Headquarters:
 Indian Institute of Information Technology Bhagalpur
 IIIT Bhagalpur, Bihar, India
 Phone: +91 98765 43210
-Email: ecocycle.project@gmail.com
+Email: mandeepkumar12032005@gmail.com
 Support Hours: Monday - Saturday, 9:00 AM - 6:00 PM IST`
       }
     ];

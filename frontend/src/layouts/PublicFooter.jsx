@@ -84,7 +84,7 @@ const PublicFooter = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-emerald-400 shrink-0" />
-                <a href="mailto:ecocycle.project@gmail.com" className="hover:text-emerald-400 transition-colors">ecocycle.project@gmail.com</a>
+                <a href="mailto:mandeepkumar12032005@gmail.com" className="hover:text-emerald-400 transition-colors">mandeepkumar12032005@gmail.com</a>
               </li>
             </ul>
           </div>
