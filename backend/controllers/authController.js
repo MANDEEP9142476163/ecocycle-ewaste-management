@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../config/db');
+const notificationService = require('../services/notificationService');
 
 // Generate JWT token helper
 const signToken = (payload) => {
@@ -38,6 +39,16 @@ exports.register = async (req, res) => {
 
     const userId = result.insertId;
     const token = signToken({ id: userId, role: 'user', email: email.toLowerCase().trim() });
+
+    // Trigger citizen registration notifications (Citizen welcome + Admin alert)
+    notificationService.notifyUserRegistered({
+      user: {
+        id: userId,
+        name: full_name.trim(),
+        email: email.toLowerCase().trim(),
+        mobile_number: mobile_number.trim()
+      }
+    }).catch(err => console.error('[Notification] Registration notify error:', err.message));
 
     return res.status(201).json({
       success: true,

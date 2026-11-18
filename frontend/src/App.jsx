@@ -23,6 +23,7 @@ import StatusMonitor from './pages/admin/StatusMonitor';
 import SearchProducts from './pages/admin/SearchProducts';
 import Reports from './pages/admin/Reports';
 import WebsitePages from './pages/admin/WebsitePages';
+import NotificationSettings from './pages/admin/NotificationSettings';
 import AdminProfile from './pages/admin/AdminProfile';
 
 // Employee Pages
@@ -75,6 +76,7 @@ function App() {
             <Route path="search" element={<SearchProducts />} />
             <Route path="reports" element={<Reports />} />
             <Route path="pages" element={<WebsitePages />} />
+            <Route path="notifications" element={<NotificationSettings />} />
             <Route path="profile" element={<AdminProfile />} />
           </Route>
 

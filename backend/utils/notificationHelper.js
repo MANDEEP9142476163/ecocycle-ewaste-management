@@ -1,14 +1,18 @@
-const { pool } = require('../config/db');
+const notificationService = require('../services/notificationService');
 
-async function createNotification({ recipientRole, recipientId = null, title, message }) {
+async function createNotification({ recipientRole, recipientId = null, title, message, eventType = null, entityId = null }) {
   try {
-    await pool.query(
-      `INSERT INTO notifications (recipient_role, recipient_id, title, message, is_read)
-       VALUES (?, ?, ?, ?, FALSE)`,
-      [recipientRole, recipientId, title, message]
-    );
+    return await notificationService.sendInApp({
+      recipientRole,
+      recipientId,
+      title,
+      message,
+      eventType,
+      entityId
+    });
   } catch (error) {
-    console.error('[Notification] Error creating notification:', error.message);
+    console.error('[NotificationHelper] Error creating notification:', error.message);
+    return { success: false, error: error.message };
   }
 }
 
