@@ -41,7 +41,7 @@ exports.register = async (req, res) => {
     const token = signToken({ id: userId, role: 'user', email: email.toLowerCase().trim() });
 
     // Trigger citizen registration notifications (Citizen welcome + Admin alert)
-    notificationService.notifyUserRegistered({
+    await notificationService.notifyUserRegistered({
       user: {
         id: userId,
         name: full_name.trim(),

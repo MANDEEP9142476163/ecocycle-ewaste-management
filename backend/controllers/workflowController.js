@@ -62,7 +62,7 @@ exports.assignProduct = async (req, res) => {
     await connection.commit();
 
     // Trigger automated multichannel notifications (Citizen & Employee)
-    notificationService.notifyEmployeeAssigned({
+    await notificationService.notifyEmployeeAssigned({
       product,
       employee,
       user: { id: product.user_id }
@@ -134,7 +134,7 @@ exports.investigateProduct = async (req, res) => {
     await connection.commit();
 
     // Trigger automated multichannel notifications
-    notificationService.notifyUnderInvestigation({
+    await notificationService.notifyUnderInvestigation({
       product,
       employee: req.user,
       user: { id: product.user_id },
@@ -204,7 +204,7 @@ exports.collectProduct = async (req, res) => {
     await connection.commit();
 
     // Trigger automated multichannel notifications (Citizen & Admin)
-    notificationService.notifyProductCollected({
+    await notificationService.notifyProductCollected({
       product,
       employee: req.user,
       user: { id: product.user_id },
@@ -274,7 +274,7 @@ exports.sendForRecycling = async (req, res) => {
     await connection.commit();
 
     // Trigger automated multichannel notifications
-    notificationService.notifySentForRecycling({
+    await notificationService.notifySentForRecycling({
       product,
       employee: req.user,
       user: { id: product.user_id },
@@ -344,7 +344,7 @@ exports.completeRecycling = async (req, res) => {
     await connection.commit();
 
     // Trigger automated multichannel notifications
-    notificationService.notifyRecyclingCompleted({
+    await notificationService.notifyRecyclingCompleted({
       product,
       employee: req.user,
       user: { id: product.user_id },
@@ -420,7 +420,7 @@ exports.rejectProduct = async (req, res) => {
     await connection.commit();
 
     // Trigger automated multichannel notifications
-    notificationService.notifyProductRejected({
+    await notificationService.notifyProductRejected({
       product,
       employee: req.user,
       user: { id: product.user_id },

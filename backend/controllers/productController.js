@@ -85,7 +85,7 @@ exports.createProduct = async (req, res) => {
     await connection.commit();
 
     // Trigger automated multichannel notifications (Citizen confirmation + Admin alert)
-    notificationService.notifyPickupSubmitted({
+    await notificationService.notifyPickupSubmitted({
       product: {
         id: productId,
         product_code: productCode,
